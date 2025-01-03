@@ -66,6 +66,6 @@ jobs:
             Published at ${{ steps.date.outputs.date }}
             
             ${{ steps.release_notes.outputs.RELEASE_NOTES }}
-          name: "v${{ steps.version.outputs.version }}"
+          name: "mobile-v${{ steps.version.outputs.version }}"
           token: ${{ secrets.GH_TOKEN }}
-          tag: "v${{ steps.version.outputs.version }}"
+          tag: "mobile-v${{ steps.version.outputs.version }}"
