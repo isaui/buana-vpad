@@ -41,6 +41,13 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: flutter build apk --split-per-abi
 
+      - name: Rename APKs
+        run: |
+          cd build/app/outputs/flutter-apk/
+          mv app-arm64-v8a-release.apk BuanaVPad-arm64-v8a.apk
+          mv app-armeabi-v7a-release.apk BuanaVPad-armeabi-v7a.apk
+          mv app-x86_64-release.apk BuanaVPad-x86_64.apk
+
       - name: Get current date
         id: date
         run: echo "date=$(TZ='Asia/Jakarta' date +'%A %d-%m-%Y %T WIB')" >> $GITHUB_OUTPUT

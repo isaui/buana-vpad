@@ -1,67 +1,75 @@
-name: Release
+name: Release Desktop
 
 on:
-  push:
-    tags:
-      - 'mobile*'
+ push:
+   tags:
+     - 'desktop-v*'
 
 jobs:
-  releases:
-    name: Build and Release APK
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: mobile
-    
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: "zulu"
-          java-version: "17"
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-
-      - name: Get packages
-        run: flutter pub get
-
-      - name: Generate Java keystore
-        env:
-          KEY_JKS: ${{ secrets.KEY_JKS }}
-        run: echo "$KEY_JKS" | base64 --decode > release-keystore.jks
-
-      - name: Build APK
-        env:
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: flutter build apk --split-per-abi
-
-      - name: Get current date
-        id: date
-        run: echo "date=$(TZ='Asia/Jakarta' date +'%A %d-%m-%Y %T WIB')" >> $GITHUB_OUTPUT
-        
-      - name: Get Release Notes
-        id: release_notes
-        run: |
-          RELEASE_NOTES=$(cat RELEASES_NOTES.md)
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Release APK
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          artifacts: "mobile/build/app/outputs/flutter-apk/*.apk"
-          body: |
-            Published at ${{ steps.date.outputs.date }}
-            
-            ${{ steps.release_notes.outputs.RELEASE_NOTES }}
-          name: "BuanaVPad Mobile ${{ github.ref_name }}"
-          token: ${{ secrets.GH_TOKEN }}
-          tag: ${{ github.ref_name }}
+ build-windows:
+   runs-on: windows-latest
+   defaults:
+     run:
+       working-directory: ./desktop
+       shell: cmd /C "call .\wheels\Scripts\activate.bat && {0}"
+   
+   steps:
+   - uses: actions/checkout@v4
+   
+   - name: Debug Info
+     run: |
+       echo "GitHub Ref: ${{ github.ref }}"
+       echo "Tag Name: ${{ github.ref_name }}"
+       echo "Current Directory: $(pwd)"
+       dir
+   
+   - name: Build executable
+     run: pyinstaller --clean buanavpad.spec
+   
+   - name: Download and Install Inno Setup
+     shell: pwsh  # Override for PowerShell commands
+     run: |
+       $installerUrl = "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe"
+       Invoke-WebRequest -Uri $installerUrl -OutFile "innosetup.exe"
+       Start-Process -FilePath "innosetup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait
+   
+   - name: Build Installer
+     run: |
+       "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+   
+   - name: Directory Structure Check
+     run: |
+       echo "Current directory:"
+       pwd
+       echo "Directory contents:"
+       dir
+       echo "Installer directory contents:"
+       dir installer
+   
+   - name: Upload build artifact
+     uses: actions/upload-artifact@v4
+     with:
+       name: BuanaVPad-Desktop-Installer
+       path: installer/BuanaVPad-Setup.exe
+       if-no-files-found: error
+   
+   - name: Create Release
+     uses: softprops/action-gh-release@v1
+     with:
+       name: BuanaVPad Desktop ${{ github.ref_name }}
+       body_path: desktop/RELEASE_NOTES.md
+       draft: false
+       prerelease: false
+       files: installer/BuanaVPad-Setup.exe
+     env:
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   
+   - name: Upload Debug Info on Failure
+     if: failure()
+     uses: actions/upload-artifact@v4
+     with:
+       name: debug-info
+       path: |
+         desktop/
+         !desktop/env/
+         !desktop/**/__pycache__
