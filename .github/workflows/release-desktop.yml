@@ -10,24 +10,17 @@ jobs:
     runs-on: windows-latest
     defaults:
       run:
-        working-directory: desktop
-        shell: cmd /C "call .\wheels\Scripts\activate.bat && {0}"
+        working-directory: ./desktop
     
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install pyinstaller
-      run: pip install pyinstaller
-    
-    - name: Debug Info
+    - name: Install wheels
+      shell: cmd
       run: |
-        echo "GitHub Ref: ${{ github.ref }}"
-        echo "Tag Name: ${{ github.ref_name }}"
-        echo "Current Directory: $(pwd)"
-        dir
-    
-    - name: Build executable
-      run: pyinstaller --clean buanavpad.spec
+        call wheels\Scripts\activate.bat
+        pip install pyinstaller
+        pyinstaller --clean buanavpad.spec
     
     - name: Download and Install Inno Setup
       shell: pwsh
@@ -53,15 +46,6 @@ jobs:
         echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
         echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
-    
-    - name: Directory Structure Check
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Directory contents:"
-        dir
-        echo "Installer directory contents:"
-        dir installer
     
     - name: Create Release
       uses: ncipollo/release-action@v1
