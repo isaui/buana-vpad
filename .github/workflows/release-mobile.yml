@@ -17,10 +17,6 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      - name: Get version from pubspec.yaml
-        id: version
-        run: echo "version=$(grep "version:" pubspec.yaml | cut -c10-)" >> $GITHUB_OUTPUT
-
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -66,6 +62,6 @@ jobs:
             Published at ${{ steps.date.outputs.date }}
             
             ${{ steps.release_notes.outputs.RELEASE_NOTES }}
-          name: "mobile-v${{ steps.version.outputs.version }}"
+          name: "BuanaVPad Mobile ${{ github.ref_name }}"
           token: ${{ secrets.GH_TOKEN }}
-          tag: "mobile-v${{ steps.version.outputs.version }}"
+          tag: ${{ github.ref_name }}
