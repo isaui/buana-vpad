@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     defaults:
       run:
-        working-directory: ./desktop
+        working-directory: desktop
         shell: cmd /C "call .\wheels\Scripts\activate.bat && {0}"
     
     steps:
@@ -30,7 +30,7 @@ jobs:
       run: pyinstaller --clean buanavpad.spec
     
     - name: Download and Install Inno Setup
-      shell: pwsh  # Override for PowerShell commands
+      shell: pwsh
       run: |
         $installerUrl = "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe"
         Invoke-WebRequest -Uri $installerUrl -OutFile "innosetup.exe"
@@ -39,6 +39,20 @@ jobs:
     - name: Build Installer
       run: |
         "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+
+    - name: Get current date
+      id: date
+      shell: bash
+      run: echo "date=$(TZ='Asia/Jakarta' date +'%A %d-%m-%Y %T WIB')" >> $GITHUB_OUTPUT
+        
+    - name: Get Release Notes
+      id: release_notes
+      shell: bash
+      run: |
+        RELEASE_NOTES=$(cat RELEASES_NOTES.md)
+        echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+        echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
     
     - name: Directory Structure Check
       run: |
@@ -49,23 +63,18 @@ jobs:
         echo "Installer directory contents:"
         dir installer
     
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: BuanaVPad-Desktop-Installer
-        path: installer/BuanaVPad-Setup.exe
-        if-no-files-found: error
-    
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: ncipollo/release-action@v1
       with:
-        name: BuanaVPad Desktop ${{ github.ref_name }}
-        body_path: desktop/RELEASE_NOTES.md
-        draft: false
-        prerelease: false
-        files: installer/BuanaVPad-Setup.exe
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        allowUpdates: true
+        artifacts: "installer/BuanaVPad-Setup.exe"
+        body: |
+          Published at ${{ steps.date.outputs.date }}
+          
+          ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+        name: "BuanaVPad ${{ github.ref_name }}"
+        token: ${{ secrets.GH_TOKEN }}
+        tag: ${{ github.ref_name }}
     
     - name: Upload Debug Info on Failure
       if: failure()
