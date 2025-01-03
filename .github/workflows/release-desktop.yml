@@ -1,75 +1,78 @@
 name: Release Desktop
 
 on:
- push:
-   tags:
-     - 'desktop-v*'
+  push:
+    tags:
+      - 'desktop-v*'
 
 jobs:
- build-windows:
-   runs-on: windows-latest
-   defaults:
-     run:
-       working-directory: ./desktop
-       shell: cmd /C "call .\wheels\Scripts\activate.bat && {0}"
-   
-   steps:
-   - uses: actions/checkout@v4
-   
-   - name: Debug Info
-     run: |
-       echo "GitHub Ref: ${{ github.ref }}"
-       echo "Tag Name: ${{ github.ref_name }}"
-       echo "Current Directory: $(pwd)"
-       dir
-   
-   - name: Build executable
-     run: pyinstaller --clean buanavpad.spec
-   
-   - name: Download and Install Inno Setup
-     shell: pwsh  # Override for PowerShell commands
-     run: |
-       $installerUrl = "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe"
-       Invoke-WebRequest -Uri $installerUrl -OutFile "innosetup.exe"
-       Start-Process -FilePath "innosetup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait
-   
-   - name: Build Installer
-     run: |
-       "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
-   
-   - name: Directory Structure Check
-     run: |
-       echo "Current directory:"
-       pwd
-       echo "Directory contents:"
-       dir
-       echo "Installer directory contents:"
-       dir installer
-   
-   - name: Upload build artifact
-     uses: actions/upload-artifact@v4
-     with:
-       name: BuanaVPad-Desktop-Installer
-       path: installer/BuanaVPad-Setup.exe
-       if-no-files-found: error
-   
-   - name: Create Release
-     uses: softprops/action-gh-release@v1
-     with:
-       name: BuanaVPad Desktop ${{ github.ref_name }}
-       body_path: desktop/RELEASE_NOTES.md
-       draft: false
-       prerelease: false
-       files: installer/BuanaVPad-Setup.exe
-     env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-   
-   - name: Upload Debug Info on Failure
-     if: failure()
-     uses: actions/upload-artifact@v4
-     with:
-       name: debug-info
-       path: |
-         desktop/
-         !desktop/env/
-         !desktop/**/__pycache__
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./desktop
+        shell: cmd /C "call .\wheels\Scripts\activate.bat && {0}"
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install pyinstaller
+      run: pip install pyinstaller
+    
+    - name: Debug Info
+      run: |
+        echo "GitHub Ref: ${{ github.ref }}"
+        echo "Tag Name: ${{ github.ref_name }}"
+        echo "Current Directory: $(pwd)"
+        dir
+    
+    - name: Build executable
+      run: pyinstaller --clean buanavpad.spec
+    
+    - name: Download and Install Inno Setup
+      shell: pwsh  # Override for PowerShell commands
+      run: |
+        $installerUrl = "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe"
+        Invoke-WebRequest -Uri $installerUrl -OutFile "innosetup.exe"
+        Start-Process -FilePath "innosetup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait
+    
+    - name: Build Installer
+      run: |
+        "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+    
+    - name: Directory Structure Check
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        dir
+        echo "Installer directory contents:"
+        dir installer
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: BuanaVPad-Desktop-Installer
+        path: installer/BuanaVPad-Setup.exe
+        if-no-files-found: error
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: BuanaVPad Desktop ${{ github.ref_name }}
+        body_path: desktop/RELEASE_NOTES.md
+        draft: false
+        prerelease: false
+        files: installer/BuanaVPad-Setup.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload Debug Info on Failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-info
+        path: |
+          desktop/
+          !desktop/env/
+          !desktop/**/__pycache__
