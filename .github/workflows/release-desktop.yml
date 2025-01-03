@@ -59,7 +59,7 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        name: BuanaVPad Desktop ${{ github.ref_name }}
+        name: BuanaVPad ${{ github.ref_name }}
         body_path: desktop/RELEASE_NOTES.md
         draft: false
         prerelease: false
