@@ -7,7 +7,12 @@ title: BuanaVPad
 
 BuanaVPad is a mobile application that allows you to turn your smartphone into a PC game controller. With BuanaVPad, you can use your mobile device as a virtual gamepad for playing games on your PC.
 
-![BuanaVPad Main Screen](https://hackmd.io/_uploads/rkOl8j48yg.png)
+# Mobile Application Documentation
+
+
+BuanaVPad is a mobile application that allows you to turn your smartphone into a PC game controller. With BuanaVPad, you can use your mobile device as a virtual gamepad for playing games on your PC.
+
+![BuanaVPad Main Screen](docs/home.png)
 
 ## Features
 
@@ -37,8 +42,9 @@ BuanaVPad is a mobile application that allows you to turn your smartphone into a
    - Dual analog sticks
    - Menu buttons
 
-![Controller List Screen](https://hackmd.io/_uploads/SySewjV81l.png)
-![Controller Layout](https://hackmd.io/_uploads/rJsfPoELke.png)
+![Controller List Screen](docs/controller_list.png)
+
+![Controller Layout](docs/layout_preview.png)
 
 
 ### Connecting to PC
@@ -49,7 +55,7 @@ BuanaVPad is a mobile application that allows you to turn your smartphone into a
 4. Select your preferred controller layout
 5. Tap "Connect" to establish the connection
 
-![Connection Screen](https://hackmd.io/_uploads/S1bd8s4Lye.png)
+![Connection Screen](docs/connect_pc.png)
 
 
 ### Customizing Your Layout
@@ -60,9 +66,9 @@ BuanaVPad is a mobile application that allows you to turn your smartphone into a
 4. Use the debug info panel to test button inputs
 5. Save your changes when finished
 
-![Layout Customization](https://hackmd.io/_uploads/BkncIjELJe.png)
+![Layout Customization](docs/layout_sidebar.png)
 
-![Layout Customization 2](https://hackmd.io/_uploads/rknTUjNU1g.png)
+![Layout Customization 2](docs/layout_edit.png)
 
 
 ## Troubleshooting
