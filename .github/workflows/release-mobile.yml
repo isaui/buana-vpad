@@ -9,6 +9,9 @@ jobs:
   releases:
     name: Build and Release APK
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
     
     steps:
       - name: Checkout the code
@@ -45,13 +48,24 @@ jobs:
       - name: Get current date
         id: date
         run: echo "date=$(TZ='Asia/Jakarta' date +'%A %d-%m-%Y %T WIB')" >> $GITHUB_OUTPUT
+        
+      - name: Get Release Notes
+        id: release_notes
+        run: |
+          RELEASE_NOTES=$(cat RELEASES_NOTES.md)
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Release APK
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "build/app/outputs/flutter-apk/*.apk"
-          body: "Published at ${{ steps.date.outputs.date }}"
+          artifacts: "mobile/build/app/outputs/flutter-apk/*.apk"
+          body: |
+            Published at ${{ steps.date.outputs.date }}
+            
+            ${{ steps.release_notes.outputs.RELEASE_NOTES }}
           name: "v${{ steps.version.outputs.version }}"
           token: ${{ secrets.GH_TOKEN }}
           tag: "v${{ steps.version.outputs.version }}"
