@@ -37,10 +37,7 @@ We're excited to announce the first stable release of BuanaVPad Mobile! Transfor
 - ~50MB storage space
 - Compatible PC with desktop application installed
 
-## Installation
 
-Download the latest APK from our GitHub releases page:
-[https://github.com/isaui/buana-vpad/releases/tag/v1.0.0](https://github.com/isaui/buana-vpad/releases/tag/v1.0.0)
 
 ## Feedback and Support
 
