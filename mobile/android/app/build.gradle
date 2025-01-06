@@ -44,11 +44,13 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
+    buildTypes {         
+        release {             
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release         
+            }
+    }     
+}
 }
 
 flutter {
