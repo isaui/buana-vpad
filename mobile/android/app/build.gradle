@@ -1,10 +1,3 @@
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -12,25 +5,21 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.buana_vpad"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    namespace "com.buana_vpad"
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
-        applicationId = "com.buana_vpad"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        applicationId "com.buana_vpad"
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     signingConfigs {
@@ -44,15 +33,17 @@ android {
         }
     }
 
-    buildTypes {         
-        release {             
+    buildTypes {
+        release {
             if (keystorePropertiesFile.exists()) {
-                signingConfig signingConfigs.release         
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
             }
-    }     
-}
+        }
+    }
 }
 
 flutter {
-    source = "../.."
+    source '../..'
 }
